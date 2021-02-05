@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
-
+use App\Models\Category;
+use App\Models\Tag;
 class PostController extends Controller
 {
     /**
@@ -27,7 +28,12 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('posts.create', compact([
+            'categories',
+            'tags'
+        ]));
     }
 
     /**
@@ -38,7 +44,27 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Image Upload and stores the name of the image
+        $image = $request->file('image')->store('posts');
+        //php artisan storage:link
+        //Create Post
+        $post=Post::create([
+            'title'=>$request->title,
+            'excerpt'=>$request->excerpt,
+            'content'=>$request->content,
+            'image'=>$image,
+            'user_id'=>auth()->id(),
+            'category_id'=>$request->category_id,
+            'published_at'=>$request->published_at
+
+            
+        ]);
+        // dd($request->tags);
+        $post->tags()->attach($request->tags);
+
+        session()->flash('success', 'Post Created Successfully');
+        
+        return redirect(route('posts.index'));
     }
 
     /**
@@ -60,7 +86,13 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $tags= Tag::all();
+        $categories = Category::all();
+        return view('posts.edit', compact([
+            'categories',
+            'post',
+            'tags'
+        ]));
     }
 
     /**
@@ -72,7 +104,21 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $data= $request->only(['title', 'excerpt', 'content', 'published_at', 'category_id']);
+        // dd($data);
+        if($request->hasFile('image')){
+            $image = $request->image->store('posts');
+            $post->deleteImage();
+            $data['image'] = $image;
+        }
+
+        $post->update($data);
+
+        // if($request->tags){
+            $post->tags()->sync($request->tags);
+        // }
+        session()->flash('success', 'Post updated successfully');
+        return redirect(route('posts.index'));
     }
 
     /**
@@ -83,6 +129,10 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post = Post::onlyTrashed()->findOrFail($id);
+        $post->deleteImage();
+        $post->forceDelete();
+        session()->flash('success', 'Post Deleted Successfully');
+        return redirect()->back();
     }
 }
