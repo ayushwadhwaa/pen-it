@@ -22,7 +22,7 @@
                         <td>
                             {{$category->name}}
                         </td>
-                        <td>{{$category->posts->count()}}</td>
+                        {{-- <td>{{$category->posts->count()}}</td> --}}
                         <td>
                             <a href="{{route('categories.edit', $category->id)}}" class="btn btn-primary btn-sm">Edit</a>
                             <a href="" class="btn btn-danger btn-sm"

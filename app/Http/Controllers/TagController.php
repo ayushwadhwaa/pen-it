@@ -27,7 +27,7 @@ class TagController extends Controller
      */
     public function create()
     {
-        //
+        return view('tags.create');
     }
 
     /**
@@ -38,7 +38,13 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Tag::create([
+            'name' => $request->name
+        ]);
+
+        // 3. Session set something and then return a view
+        session()->flash('success', 'Tag Added Successfully!');
+        return redirect(route('tags.index'));
     }
 
     /**
@@ -60,7 +66,9 @@ class TagController extends Controller
      */
     public function edit(Tag $tag)
     {
-        //
+        return view('tags.edit', compact([
+            'tag'
+        ]));
     }
 
     /**
@@ -72,7 +80,11 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag)
     {
-        //
+        $tag->name = $request->name;
+        $tag->save();
+        // $tag->update(['name' => $request->name]);
+        session()->flash('success', 'Tag Updated Succesfully!');
+        return redirect(route('tags.index'));
     }
 
     /**
@@ -83,6 +95,8 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag)
     {
-        //
+        $tag->delete();
+        session()->flash('success', 'Tag Deleted Successfully!');
+        return redirect(route('tags.index'));
     }
 }
