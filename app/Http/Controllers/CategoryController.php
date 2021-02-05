@@ -14,7 +14,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+        return view('categories.index', compact([
+            'categories'
+        ]));
     }
 
     /**
@@ -24,7 +27,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view('categories.create');
     }
 
     /**
@@ -35,7 +38,11 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Category::create([
+            'name'=>$request->name
+        ]);
+        session()->flash('success', 'Category Added successfully');
+        return redirect(route('categories.index'));
     }
 
     /**
@@ -57,7 +64,9 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        return view('categories.edit', compact([
+            'category'
+        ]));
     }
 
     /**
@@ -69,7 +78,11 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $category->name = $request->name;
+        $category->save();
+        // $category->update(['name'=>$request->name]);
+        session()->flash('success', 'Category updated successfully');
+        return redirect(route('categories.index'));
     }
 
     /**
@@ -80,6 +93,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        if($category->posts->count()>0){
+            session()->flash('error', 'Category cannot be Deleted as it is associated with a post');
+            return redirect()->back();
+        }
+        $category->delete();
+        session()->flash('success', "Category Deleted SuccessFully");
+        return redirect(route('categories.index'));
     }
 }

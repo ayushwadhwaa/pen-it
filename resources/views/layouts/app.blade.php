@@ -76,7 +76,33 @@
         </nav>
 
         <main class="py-4">
-            @yield('content')
+            @auth
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <a href="{{ route('categories.index') }}">Categories</a>
+                            </li>
+                            <li class="list-group-item"> 
+                                <a href="{{ route('posts.index') }}">Posts</a> 
+                            </li>
+                            <li class="list-group-item"> 
+                                <a href="{{ route('tags.index') }}">Tags</a> 
+                            </li>
+                            {{-- <li class="list-group-item"> 
+                                <a href="{{ route('users.index') }}">Users</a> 
+                            </li> --}}
+                        </ul>
+                    </div>
+                    <div class="col-md-9">
+                        @yield('content')
+                    </div>
+                </div>
+            </div>
+            @else
+                @yield('content')
+            @endauth
         </main>
     </div>
 </body>
